@@ -1,7 +1,5 @@
 var cityList =$("#city-list");
-
 var cities = [];
-console.log(cities);
 
 //Calling function init();
 init();
@@ -18,16 +16,12 @@ function init(){
       }
     // Render cities to the DOM
     renderCities();
-    // console.log(cities);
 }
-
 //Function StoreCities()
 function storeCities(){
    // Stringify and set "cities" key in localStorage to cities array
   localStorage.setItem("cities", JSON.stringify(cities));
-  console.log(localStorage);
 }
-
 //Function renderCities()
 function renderCities() {
      // Clear cityList element
@@ -38,13 +32,10 @@ function renderCities() {
     // Render a new li for each city
     for (var i = 0; i < cities.length; i++) {
       var city = cities[i];
-      console.log(city);
 
       var li = $("<li>").text(city);
-      li.attr("data-index", i);
+      li.attr("data-city", city);
       li.attr("class", "list-group-item");
-      console.log(li);
-
       cityList.append(li);
     }
   }
@@ -62,10 +53,6 @@ function renderCities() {
 
     //Adding city-input to the city array
     cities.push(city);
-    // console.log(cities);
-    // city= "";
-    console.log(cities);
-    console.log(city);
     // Store updated cities in localStorage, re-render the list
   storeCities();
   renderCities();
