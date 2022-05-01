@@ -3,10 +3,17 @@ var cities = [];
 var key = "fc8bffadcdca6a94d021c093eac22797";
 
 //Format for day
-var date = new Date();
+function FormatDay(date){
+    var date = new Date();
+    console.log(date);
+    var month = date.getMonth()+1;
+    var day = date.getDate();
 
-var month = date.getMonth()+1;
-var day = date.getDate();
+    var dayOutput = date.getFullYear() + '/' +
+        (month<10 ? '0' : '') + month + '/' +
+        (day<10 ? '0' : '') + day;
+    return dayOutput;
+}
 
 var dayOutput = date.getFullYear() + '/' +
     (month<10 ? '0' : '') + month + '/' +
@@ -52,8 +59,13 @@ function renderCities() {
       cityList.prepend(li);
     }
      //Get Response weather for the first city only
-     getResponseWeather(city);
-  }
+     if (!city){
+        return
+    } 
+    else{
+        getResponseWeather(city)
+    };
+}   
 
   //When form is submitted...
   $("#add-city").on("click", function(event){
@@ -77,8 +89,7 @@ function renderCities() {
   //Function get Response Weather 
 
   function getResponseWeather(cityName){
-    var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" +cityName+ "&appid=" + key; 
-
+    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" +cityName+ "&appid=" + key; 
     //Clear content of today-weather
     $("#today-weather").empty();
     $.ajax({
@@ -99,7 +110,7 @@ function renderCities() {
       var CoordLat = response.coord.lat;
 
     // API to get UV index
-    var queryURL2 = "http://api.openweathermap.org/data/2.5/uvi?appid="+ key+ "&lat=" + CoordLat +"&lon=" + CoordLon;
+    var queryURL2 = "https://api.openweathermap.org/data/2.5/uvi?appid="+ key+ "&lat=" + CoordLat +"&lon=" + CoordLon;
     $.ajax({
         url: queryURL2,
         method: "GET"
@@ -121,11 +132,49 @@ function renderCities() {
       });
       //API to get 5-day forcast.
 
+      var cnt = 5;   
+      var queryURL3 = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + key;
+        $.ajax({
+        url: queryURL3,
+        method: "GET"
+      }).then(function(response5day) { 
+        $("#boxes").empty();
+        console.log(response5day);
+        for(var i=0; i<15; i=i+2){
+            var FivedayDiv = $("<div>");
+            FivedayDiv.attr("class","col-3 m-2 bg-primary")
+            var read_date = response5day.list[i].dt;
+            var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+            d.setUTCSeconds(read_date);
+            var date = d;
+            console.log(date);
+            var month = date.getMonth()+1;
+            var day = date.getDate();
+            var dayOutput = date.getFullYear() + '/' +
+            (month<10 ? '0' : '') + month + '/' +
+            (day<10 ? '0' : '') + day;
+            var Fivedayh4 = $("<h6>").text(dayOutput);
+            //Set src to the imags
+            var imgtag = $("<img>");
+            var pTemperatureK = response5day.list[i].main.temp;
+            var TempetureTof = parseInt((pTemperatureK)* 9/5 - 459);
+            var pTemperature = $("<p>").text("Tempeture: "+ TempetureToNum + " °F");
+            var pHumidity = $("<p>").text("Humidity: "+ response5day.list[i].main.humidity + " %");
+            FivedayDiv.append(Fivedayh4);
+            FivedayDiv.append(imgtag);
+            FivedayDiv.append(pTemperature);
+            FivedayDiv.append(pHumidity);
+
+            $("#boxes").prepend(FivedayDiv);
 
 
 
-      
+        }
+
     });
 
 
-  }
+
+
+
+ 
