@@ -15,9 +15,6 @@ function FormatDay(date){
     return dayOutput;
 }
 
-var dayOutput = date.getFullYear() + '/' +
-    (month<10 ? '0' : '') + month + '/' +
-    (day<10 ? '0' : '') + day;
 
 
 //Calling function init();
@@ -35,31 +32,36 @@ function init(){
       }
     // Render cities to the DOM
     renderCities();
+    // console.log(cities);
 }
+
 //Function StoreCities()
 function storeCities(){
    // Stringify and set "cities" key in localStorage to cities array
   localStorage.setItem("cities", JSON.stringify(cities));
+  console.log(localStorage);
 }
+
 //Function renderCities()
 function renderCities() {
-     // Clear cityList element
+    // Clear cityList element
     // cityList.text = "";
     // cityList.HTML = "";
     cityList.empty();
-
+    
     // Render a new li for each city
     for (var i = 0; i < cities.length; i++) {
       var city = cities[i];
-
+      
       var li = $("<li>").text(city);
-      li.attr('id', 'istc');
+      li.attr("id","listC");
       li.attr("data-city", city);
       li.attr("class", "list-group-item");
+      console.log(li);
       cityList.prepend(li);
     }
-     //Get Response weather for the first city only
-     if (!city){
+    //Get Response weather for the first city only
+    if (!city){
         return
     } 
     else{
@@ -73,31 +75,32 @@ function renderCities() {
 
     // This line will grab the city from the input box
     var city = $("#city-input").val().trim();
-    // return from function early if submitted city is blank
-    if (city ===''){
+    
+    // Return from function early if submitted city is blank
+    if (city === "") {
         return;
     }
-
     //Adding city-input to the city array
     cities.push(city);
     // Store updated cities in localStorage, re-render the list
   storeCities();
   renderCities();
-
   });
 
   //Function get Response Weather 
-
+  
   function getResponseWeather(cityName){
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" +cityName+ "&appid=" + key; 
+
     //Clear content of today-weather
     $("#today-weather").empty();
     $.ajax({
       url: queryURL,
       method: "GET"
     }).then(function(response) {
+        
       // Create a new table row element
-      var cityTitle = $("<h3>").text(response.name + " "+ dayOutput);
+      cityTitle = $("<h3>").text(response.name + " "+ FormatDay());
       $("#today-weather").append(cityTitle);
       var TempetureToNum = parseInt((response.main.temp)* 9/5 - 459);
       var cityTemperature = $("<p>").text("Tempeture: "+ TempetureToNum + " °F");
@@ -108,9 +111,9 @@ function renderCities() {
       $("#today-weather").append(cityWindSpeed);
       var CoordLon = response.coord.lon;
       var CoordLat = response.coord.lat;
-
-     //Api to get UV index
-     var queryURL2 = "https://api.openweathermap.org/data/2.5/uvi?appid="+ key+ "&lat=" + CoordLat +"&lon=" + CoordLon;
+    
+        //Api to get UV index
+        var queryURL2 = "https://api.openweathermap.org/data/2.5/uvi?appid="+ key+ "&lat=" + CoordLat +"&lon=" + CoordLon;
         $.ajax({
             url: queryURL2,
             method: "GET"
@@ -119,19 +122,25 @@ function renderCities() {
             var cityUVp = $("<p>").text("UV Index: ");
             cityUVp.append(cityUV);
             $("#today-weather").append(cityUVp);
-            if(cityUV <= 2){
-                cityUV.attr("class","green"
+            console.log(typeof responseuv.value);
+            if(responseuv.value > 0 && responseuv.value <=2){
+                cityUV.attr("class","green")
             }
-            else if (cityUV <= 7){
+            else if (responseuv.value > 2 && responseuv.value <= 5){
+                cityUV.attr("class","yellow")
+            }
+            else if (responseuv.value >5 && responseuv.value <= 7){
                 cityUV.attr("class","orange")
             }
-            else{
+            else if (responseuv.value >7 && responseuv.value <= 10){
                 cityUV.attr("class","red")
             }
+            else{
+                cityUV.attr("class","purple")
+            }
         });
-
-        //Api to get 5-day forecast
-        var cnt = 5;   
+    
+        //Api to get 5-day forecast  
         var queryURL3 = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + key;
             $.ajax({
             url: queryURL3,
@@ -156,7 +165,17 @@ function renderCities() {
                     var Fivedayh4 = $("<h6>").text(dayOutput);
                     //Set src to the imags
                     var imgtag = $("<img>");
+                    var skyconditions = response5day.list[i].weather[0].main;
+                    if(skyconditions==="Clouds"){
+                        imgtag.attr("src", "https://img.icons8.com/color/48/000000/cloud.png")
+                    } else if(skyconditions==="Clear"){
+                        imgtag.attr("src", "https://img.icons8.com/color/48/000000/summer.png")
+                    }else if(skyconditions==="Rain"){
+                        imgtag.attr("src", "https://img.icons8.com/color/48/000000/rain.png")
+                    }
+
                     var pTemperatureK = response5day.list[i].main.temp;
+                    console.log(skyconditions);
                     var TempetureToNum = parseInt((pTemperatureK)* 9/5 - 459);
                     var pTemperature = $("<p>").text("Tempeture: "+ TempetureToNum + " °F");
                     var pHumidity = $("<p>").text("Humidity: "+ response5day.list[i].main.humidity + " %");
@@ -165,21 +184,22 @@ function renderCities() {
                     FivedayDiv.append(pTemperature);
                     FivedayDiv.append(pHumidity);
                     $("#boxes").append(FivedayDiv);
+                    console.log(response5day);
                     j++;
                 }
-
-            $("#boxes").prepend(FivedayDiv);
-
-
-
+            
         }
       
     });
       
+
     });
-   //Click function to each Li 
+    
+  }
+
+  //Click function to each Li 
   $(document).on("click", "#listC", function() {
     var thisCity = $(this).attr("data-city");
     getResponseWeather(thisCity);
-  }); 
-  }
+  });
+
