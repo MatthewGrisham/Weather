@@ -8,7 +8,7 @@ function FormatDay(date){
     console.log(date);
     var month = date.getMonth()+1;
     var day = date.getDate();
-
+    
     var dayOutput = date.getFullYear() + '/' +
         (month<10 ? '0' : '') + month + '/' +
         (day<10 ? '0' : '') + day;
@@ -118,8 +118,7 @@ function renderCities() {
         var cityUV = $("<span>").text(responseuv.value);
         var cityUVp = $("<p>").text("UV Index: ");
         cityUVp.append(cityUV);
-        $("#today-weather").append(cityUV);
-        $("#today-weather").append(cityUV);
+        $("#today-weather").append(cityUVp);
         if(cityUV <= 2){
             cityUV.attr("class","green")
         }
@@ -130,8 +129,7 @@ function renderCities() {
             cityUV.attr("class","red")
         }
       });
-      //API to get 5-day forcast.
-
+      //Api to get 5-day forecast
       var cnt = 5;   
       var queryURL3 = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + key;
         $.ajax({
@@ -140,41 +138,43 @@ function renderCities() {
       }).then(function(response5day) { 
         $("#boxes").empty();
         console.log(response5day);
-        for(var i=0; i<15; i=i+2){
-            var FivedayDiv = $("<div>");
-            FivedayDiv.attr("class","col-3 m-2 bg-primary")
+        for(var i=0, j=0; j<=5; i=i+6){
             var read_date = response5day.list[i].dt;
-            var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-            d.setUTCSeconds(read_date);
-            var date = d;
-            console.log(date);
-            var month = date.getMonth()+1;
-            var day = date.getDate();
-            var dayOutput = date.getFullYear() + '/' +
-            (month<10 ? '0' : '') + month + '/' +
-            (day<10 ? '0' : '') + day;
-            var Fivedayh4 = $("<h6>").text(dayOutput);
-            //Set src to the imags
-            var imgtag = $("<img>");
-            var pTemperatureK = response5day.list[i].main.temp;
-            var TempetureTof = parseInt((pTemperatureK)* 9/5 - 459);
-            var pTemperature = $("<p>").text("Tempeture: "+ TempetureToNum + " °F");
-            var pHumidity = $("<p>").text("Humidity: "+ response5day.list[i].main.humidity + " %");
-            FivedayDiv.append(Fivedayh4);
-            FivedayDiv.append(imgtag);
-            FivedayDiv.append(pTemperature);
-            FivedayDiv.append(pHumidity);
+            if(response5day.list[i].dt != response5day.list[i+1].dt){
+                var FivedayDiv = $("<div>");
+                FivedayDiv.attr("class","col-3 m-2 bg-primary")
+                var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                d.setUTCSeconds(read_date);
+                var date = d;
+                console.log(date);
+                var month = date.getMonth()+1;
+                var day = date.getDate();
+                var dayOutput = date.getFullYear() + '/' +
+                (month<10 ? '0' : '') + month + '/' +
+                (day<10 ? '0' : '') + day;
+                var Fivedayh4 = $("<h6>").text(dayOutput);
+                //Set src to the imags
+                var imgtag = $("<img>");
+                var pTemperatureK = response5day.list[i].main.temp;
+                var TempetureToNum = parseInt((pTemperatureK)* 9/5 - 459);
+                var pTemperature = $("<p>").text("Tempeture: "+ TempetureToNum + " °F");
+                var pHumidity = $("<p>").text("Humidity: "+ response5day.list[i].main.humidity + " %");
+                FivedayDiv.append(Fivedayh4);
+                FivedayDiv.append(imgtag);
+                FivedayDiv.append(pTemperature);
+                FivedayDiv.append(pHumidity);
+                $("#boxes").append(FivedayDiv);
+                j++;
+            }
 
             $("#boxes").prepend(FivedayDiv);
 
 
 
         }
-
+      
     });
-
-
-
-
-
- 
+      
+    });
+    
+  }
