@@ -49,7 +49,7 @@ function renderCities() {
       li.attr('id', 'istc');
       li.attr("data-city", city);
       li.attr("class", "list-group-item");
-      cityList.append(li);
+      cityList.prepend(li);
     }
      //Get Response weather for the first city only
      getResponseWeather(city);
@@ -98,7 +98,7 @@ function renderCities() {
       var CoordLon = response.coord.lon;
       var CoordLat = response.coord.lat;
 
-
+    // API to get UV index
     var queryURL2 = "http://api.openweathermap.org/data/2.5/uvi?appid="+ key+ "&lat=" + CoordLat +"&lon=" + CoordLon;
     $.ajax({
         url: queryURL2,
@@ -119,6 +119,13 @@ function renderCities() {
             cityUV.attr("class","red")
         }
       });
+      //API to get 5-day forcast.
+
+
+
+
+      
     });
+
 
   }
