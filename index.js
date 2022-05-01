@@ -93,7 +93,7 @@ function renderCities() {
       $("#today-weather").append(cityTemperature);
       var cityHumidity = $("<p>").text("Humidity: "+ response.main.humidity + " %");
       $("#today-weather").append(cityHumidity);
-      var cityWindSpeed = $("<p>").text("Humidity: "+ response.wind.speed + " MPH");
+      var cityWindSpeed = $("<p>").text("Wind Speed: "+ response.wind.speed + " MPH");
       $("#today-weather").append(cityWindSpeed);
       var CoordLon = response.coord.lon;
       var CoordLat = response.coord.lat;
@@ -104,12 +104,10 @@ function renderCities() {
         url: queryURL2,
         method: "GET"
       }).then(function(responseuv) {
-        // Create a new table row element
         var cityUV = $("<span>").text(responseuv.value);
-        var cityUVp = $("<p>").text("UV index: ");
-        cityUVp.attr("id","uvp");
-        $("uvp").append(cityUV);
-        $("#today-weather").append(cityUVp);
+        var cityUVp = $("<p>").text("UV Index: ");
+        cityUVp.append(cityUV);
+        $("#today-weather").append(cityUV);
         $("#today-weather").append(cityUV);
         if(cityUV <= 2){
             cityUV.attr("class","green")
